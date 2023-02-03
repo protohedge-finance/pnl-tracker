@@ -12,7 +12,7 @@ def track_pnl(request):
 	load_dotenv()
 	config = Config()
 	w3 = web3.Web3(web3.HTTPProvider(config.rpc_url))
-	redis = Redis(config.redis_connection_string)
+	redis = Redis(host=config.redis_host, port=config.redis_port, password=config.redis_password)
 	pnl_repository = PnlRepository(redis)
 	vault_repository = VaultRepository(w3)
 
