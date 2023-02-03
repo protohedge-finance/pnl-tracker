@@ -5,4 +5,4 @@ RUN  pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
 COPY . ${LAMBDA_TASK_ROOT}
 
-CMD [ "main.main" ]
+CMD [ "pnl_tracker.track_pnl" ]

@@ -1,7 +1,6 @@
 from pnl_tracker import track_pnl
 
-def main():
-	track_pnl(None)	
+track_pnl(None, None)	
 
 
-main()
+
