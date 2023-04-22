@@ -5,6 +5,7 @@ from repositories.pnl_repository import PnlRepository
 from repositories.vault_repository import VaultRepository
 from redis import Redis
 
+
 def track_pnl(event, context):
 	"""
 	Tracks of the profit and loss of various protohedge strategies
@@ -22,11 +23,5 @@ def track_pnl(event, context):
 	vault_repository = VaultRepository(w3)
 
 	pnl = vault_repository.get_pnl(config.vault_address)
+	print("pnl: {}".format(pnl))
 	pnl_repository.add_pnl(pnl)
-	
-	
-
-	
-
-
-	

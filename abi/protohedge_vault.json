@@ -1,5 +1,26 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "positionManager",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "errorMessage",
+        "type": "string"
+      }
+    ],
+    "name": "PositionManagerCannotRebalance",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -67,6 +88,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "TotalCompound",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "implementation",
@@ -92,6 +126,32 @@
   {
     "inputs": [],
     "name": "amountToRebalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "compound",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "compoundedAmount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -158,9 +218,36 @@
         "internalType": "address",
         "name": "_usdcAddress",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_priceUtilsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_ethPriceFeedAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_rebalancePercent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_wethTokenAddress",
+        "type": "address"
       }
     ],
     "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidate",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -183,9 +270,9 @@
     "name": "pnl",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "int256",
         "name": "",
-        "type": "uint256"
+        "type": "int256"
       }
     ],
     "stateMutability": "view",
@@ -205,6 +292,19 @@
         "internalType": "contract IPositionManager",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "positionsWorth",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -249,6 +349,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "rebalancePercent",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -271,19 +384,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_ethPriceFeedAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setEthPriceFeedAddress",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "contract IPositionManager[]",
         "name": "_positionManagers",
         "type": "address[]"
@@ -297,14 +397,37 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "priceUtilsAddress",
-        "type": "address"
+        "components": [
+          {
+            "internalType": "contract IPositionManager",
+            "name": "positionManager",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "usdcAmountToHave",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct RebalanceQueueData[]",
+        "name": "rebalanceQueueData",
+        "type": "tuple[]"
       }
     ],
-    "name": "setPriceUtils",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "shouldRebalance",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -405,11 +528,6 @@
                 "type": "uint256"
               },
               {
-                "internalType": "bool",
-                "name": "canRebalance",
-                "type": "bool"
-              },
-              {
                 "internalType": "uint256",
                 "name": "collateralRatio",
                 "type": "uint256"
@@ -443,6 +561,21 @@
             "internalType": "uint256",
             "name": "availableLiquidity",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "positionsWorth",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "costBasis",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "pnl",
+            "type": "int256"
           }
         ],
         "internalType": "struct VaultStats",
@@ -462,6 +595,13 @@
       }
     ],
     "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "transferToOwner",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -525,12 +665,38 @@
   },
   {
     "inputs": [],
+    "name": "vaultPositionWorth",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "vaultWorth",
     "outputs": [
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wethToken",
+    "outputs": [
+      {
+        "internalType": "contract ERC20",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
